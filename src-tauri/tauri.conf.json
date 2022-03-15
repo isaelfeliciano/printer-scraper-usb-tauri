@@ -1,0 +1,80 @@
+{
+	"package": {
+		"productName": "Printer-Scraper",
+		"version": "0.1.1"
+	},
+	"build": {
+		"distDir": "../public",
+		"devPath": "http://localhost:5050",
+		"beforeDevCommand": "yarn dev",
+		"beforeBuildCommand": "yarn build"
+	},
+	"tauri": {
+		"cli": {
+			"description": "Printer Scraper API",
+			"args": [
+				{
+					"short": "p",
+					"name": "path",
+					"takesValue": true,
+					"description": "Origin path"
+				}
+			]
+		},
+		"bundle": {
+			"active": true,
+			"targets": ["all"],
+			"identifier": "com.printer.scraper.dev",
+			"icon": [
+				"icons/32x32.png",
+				"icons/128x128.png",
+				"icons/128x128@2x.png",
+				"icons/icon.icns",
+				"icons/icon.ico"
+			],
+			"copyright": "",
+			"category": "DeveloperTool",
+			"shortDescription": "",
+			"longDescription": "",
+			"deb": {
+				"depends": [],
+				"useBootstrapper": false
+			},
+			"macOS": {
+				"frameworks": [],
+				"minimumSystemVersion": "",
+				"useBootstrapper": false,
+				"exceptionDomain": "",
+				"signingIdentity": null,
+				"entitlements": null
+			},
+			"windows": {
+				"certificateThumbprint": null,
+				"digestAlgorithm": "sha256",
+				"timestampUrl": ""
+			}
+		},
+		"updater": {
+			"active": false,
+			"endpoints": [
+				"https://firebasestorage.googleapis.com/v0/b/printer-scraper.appspot.com/o/printer-scraper-update-manifest.json?alt=media"
+			],
+			"dialog": false
+		},
+		"allowlist": {
+			"all": true
+		},
+		"windows": [
+			{
+				"title": "Printer Scraper by Roger",
+				"width": 720,
+				"height": 360,
+				"resizable": false,
+				"fullscreen": false
+			}
+		],
+		"security": {
+			"csp": "default-src blob: data: filesystem: ws: http: https: 'unsafe-eval' 'unsafe-inline'"
+		}
+	}
+}

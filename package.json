@@ -1,0 +1,43 @@
+{
+	"name": "printer-scraper-usb-tauri",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"tauri": "tauri",
+		"build": "rollup -c",
+		"dev": "rollup -c -w",
+		"start": "sirv public --no-clear -p 5050",
+		"validate": "svelte-check"
+	},
+	"devDependencies": {
+		"@fullhuman/postcss-purgecss": "^4.0.3",
+		"@rollup/plugin-commonjs": "^17.0.0",
+		"@rollup/plugin-node-resolve": "^11.0.0",
+		"@rollup/plugin-typescript": "^8.0.0",
+		"@tauri-apps/api": "^1.0.0-beta.8",
+		"@tauri-apps/cli": "^1.0.0-beta.10",
+		"@tsconfig/svelte": "^1.0.0",
+		"autoprefixer": "^10.4.0",
+		"execa": "^5.1.1",
+		"postcss": "^8.3.11",
+		"postcss-import": "^14.0.2",
+		"rollup": "^2.3.4",
+		"rollup-plugin-css-only": "^3.1.0",
+		"rollup-plugin-livereload": "^2.0.0",
+		"rollup-plugin-postcss": "^4.0.1",
+		"rollup-plugin-svelte": "^7.0.0",
+		"rollup-plugin-terser": "^7.0.0",
+		"sirv-cli": "^1.0.0",
+		"svelte": "^3.0.0",
+		"svelte-check": "^1.0.0",
+		"svelte-preprocess": "^4.0.0",
+		"tailwindcss": "^2.2.19",
+		"tslib": "^2.0.0",
+		"typescript": "^4.0.0"
+	},
+	"dependencies": {
+		"log4js": "^6.3.0",
+		"numeral": "^2.0.6",
+		"realm-web": "^1.3.0"
+	}
+}

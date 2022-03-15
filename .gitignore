@@ -1,0 +1,14 @@
+/node_modules/
+/public/build/
+
+.DS_Store
+.vscode
+yarn.lock
+yarn-error.log
+src-tauri/binaries/app-x86_64-pc-windows-msvc.exe
+src-tauri/Cargo.lock
+src-tauri/binaries/geckodriver.exe
+src-tauri/binaries/scraper-x86_64-pc-windows-msvc.exe
+package-lock.json
+scraper.log
+src-tauri/scraper_update.cab
