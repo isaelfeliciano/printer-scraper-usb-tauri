@@ -7,10 +7,12 @@
 	import { onMount } from 'svelte'
 	import { downloadDir, currentDir } from "@tauri-apps/api/path"
 	import { tempdir } from "@tauri-apps/api/os"
-	import { copyFile, removeFile } from "@tauri-apps/api/fs"
+	import { copyFile, removeFile, readTextFile } from "@tauri-apps/api/fs"
 	import { getMatches } from '@tauri-apps/api/cli'
 	import { getVersion } from '@tauri-apps/api/app'
 	import TailwindCSS from './TailwindCSS.svelte'
+	// import { getLocalPrinters, local_printers } from "./components/GetLocalPrinters.svelte"
+	import { executeCommand } from './components/ExecuteCommand.svelte'
 
 	// UPDATER
 	import { checkUpdate, installUpdate } from "@tauri-apps/api/updater"
@@ -100,9 +102,44 @@
 			printersCollection = {},
 			configCollection = {},
 			config = {},
-			intervalTasks
+			intervalTasks,
+			configLocal = {},
+			localPrinters = ['Buscando printers'],
+			localPrintersComponent,
+			printerSelected = 'Buscando printers'
+
+
+	async function getConfigLocal(){
+		configLocal = await readTextFile("../printer-scraper-config.json")
+		configLocal = JSON.parse(configLocal)
+		console.log(configLocal.name)
+	}
+
+	async function createPerformanceMonitor() {
+
+	}
+
+	function getLocalPrinters() {
+		executeCommand('wmic', ['printer', 'list', 'brief'], (err, result) => {
+			if (err) {
+				console.error("Error ejecutando comando", err)
+				return
+			}
+			result = result.split('\n')
+			result.pop()
+			result.shift()
+			result = result.map(line => {
+				return line.replace('\r', '')
+					.replace(/^\s*|\s*$/g, '')
+					.replace(/\s{2,}/g, ',').split(',')[0]
+			})
+			localPrinters = result
+		})
+	}
 
 	onMount(async () => {
+		getConfigLocal()
+		getLocalPrinters()
 		await loginToRealm().then((user) => {
 			if (user){
 				realmUser = user
@@ -205,9 +242,18 @@
 
 
 <div class="container p-2 h-screen">
+	{#if configLocal.first_time}
+		<select bind:value={printerSelected}>
+			{#each localPrinters as printer}
+				<option value={printer}>
+					{printer}
+				</option>
+			{/each}
+		</select>
+	{/if}
 	<p>Información de status:</p>
 	<p>{statusMessage}</p>
-	<div class="relative bg-white h-3/5 w-100 p-2 overflow-auto rounded-sm">
+	<div class="relative bg-white h-1/4 w-100 p-2 overflow-auto rounded-sm">
 		<ul class="list-none">
 			{#each logList as _log}
 			<li>[{getTimestamp()}] {_log}</li>
