@@ -9,6 +9,7 @@
 	import { copyFile, removeFile, readTextFile } from "@tauri-apps/api/fs"
 	import { getMatches } from '@tauri-apps/api/cli'
 	import { getVersion } from '@tauri-apps/api/app'
+	import { message } from '@tauri-apps/api/dialog'
 	import TailwindCSS from './TailwindCSS.svelte'
 	// import { getLocalPrinters, local_printers } from "./components/GetLocalPrinters.svelte"
 	import { executeCommand } from './components/ExecuteCommand.svelte'
@@ -269,7 +270,7 @@
 
 
 <div class="container p-2 h-screen">
-	{#if configLocal.first_time}
+	{#if true}
 		<select bind:value={printerSelected}>
 			{#each localPrinters as printer}
 				<option value={printer}>
