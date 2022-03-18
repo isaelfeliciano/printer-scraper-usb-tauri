@@ -4,7 +4,7 @@
 	import * as Realm from "realm-web"
 	import { projection } from './store.js'
 	import { onMount } from 'svelte'
-	import { downloadDir, appDir } from "@tauri-apps/api/path"
+	import { downloadDir, appDir, resourceDir } from "@tauri-apps/api/path"
 	import { tempdir } from "@tauri-apps/api/os"
 	import { copyFile, removeFile, readTextFile } from "@tauri-apps/api/fs"
 	import { getMatches } from '@tauri-apps/api/cli'
@@ -110,7 +110,11 @@
 
 
 	async function getConfigLocal(){
-		configLocal = await readTextFile("printer-scraper-config.json")
+		let app_dir = await appDir()
+		let resource_dir = await resourceDir()
+		console.log(resource_dir)
+		console.log(app_dir)
+		configLocal = await readTextFile(resource_dir+"assets\\printer-scraper-config.json")
 		configLocal = JSON.parse(configLocal)
 		console.log(configLocal.name)
 	}
@@ -149,8 +153,6 @@
 	}
 
 	async function importPerformanceMonitor() {
-		let app_dir = await appDir()
-		console.log(app_dir)
 		executeCommand('import-template', ['C:\\performance_monitor_template.xml'], (err, result) => {
 			if (err) {
 				console.error("Error importando PM template", err)
@@ -270,7 +272,7 @@
 
 
 <div class="container p-2 h-screen">
-	{#if true}
+	{#if configLocal.first_time == true}
 		<select bind:value={printerSelected}>
 			{#each localPrinters as printer}
 				<option value={printer}>
