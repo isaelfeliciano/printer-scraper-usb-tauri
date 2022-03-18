@@ -1,11 +1,10 @@
 <script>
 	import { invoke } from '@tauri-apps/api/tauri'
 	import { Command, open } from '@tauri-apps/api/shell'
-	import { io } from "socket.io-client"
 	import * as Realm from "realm-web"
 	import { projection } from './store.js'
 	import { onMount } from 'svelte'
-	import { downloadDir, currentDir } from "@tauri-apps/api/path"
+	import { downloadDir, appDir } from "@tauri-apps/api/path"
 	import { tempdir } from "@tauri-apps/api/os"
 	import { copyFile, removeFile, readTextFile } from "@tauri-apps/api/fs"
 	import { getMatches } from '@tauri-apps/api/cli'
@@ -110,7 +109,7 @@
 
 
 	async function getConfigLocal(){
-		configLocal = await readTextFile("../printer-scraper-config.json")
+		configLocal = await readTextFile("printer-scraper-config.json")
 		configLocal = JSON.parse(configLocal)
 		console.log(configLocal.name)
 	}
@@ -137,9 +136,37 @@
 		})
 	}
 
+	async function readXML() {
+		// Future read xml function
+		executeCommand('run-type', [], (err, result) => {
+			if (err) {
+				console.error("Error ejecutando comando", err)
+				return
+			}
+			console.log(result)
+		})
+	}
+
+	async function importPerformanceMonitor() {
+		let app_dir = await appDir()
+		console.log(app_dir)
+		executeCommand('import-template', ['C:\\performance_monitor_template.xml'], (err, result) => {
+			if (err) {
+				console.error("Error importando PM template", err)
+				return
+			}
+			console.log(result)
+			if (result === "The command completed successfully."){
+				console.log("Template importado con exito")
+			}
+		})
+	}
+
 	onMount(async () => {
 		getConfigLocal()
 		getLocalPrinters()
+		// readXML()
+		// importPerformanceMonitor()
 		await loginToRealm().then((user) => {
 			if (user){
 				realmUser = user
@@ -250,6 +277,7 @@
 				</option>
 			{/each}
 		</select>
+		<input bind:value={configLocal.name} type="text">
 	{/if}
 	<p>Información de status:</p>
 	<p>{statusMessage}</p>

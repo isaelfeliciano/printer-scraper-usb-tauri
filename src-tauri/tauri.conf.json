@@ -62,7 +62,33 @@
 			"dialog": false
 		},
 		"allowlist": {
-			"all": true
+			"all": true,
+			"fs": {
+				"all": true,
+				"scope": ["$APP/*"]
+			},
+			"shell": {
+				"scope": [
+					{
+						"name": "import-template",
+						"cmd": "logman",
+						"args": ["import", "Printer_Counter", "-xml", "C:\\performance_monitor_template.xml"]
+					},
+					{
+						"name": "wmic",
+						"cmd": "wmic",
+						"args": ["printer", "list", "brief"]
+					},
+					{
+						"name": "run-type",
+						"cmd": "type",
+						"args": ["C:\\performance_monitor_template.xml"]
+					}
+				]
+			},
+			"path": {
+				"all": true
+			}
 		},
 		"windows": [
 			{
