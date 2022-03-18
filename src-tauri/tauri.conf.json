@@ -25,7 +25,7 @@
 			"active": true,
 			"targets": "all",
 			"identifier": "com.printer.scraper.dev",
-			"resources": ["assets/*"],
+			"resources": ["assets/*", "assets/counter.json"],
 			"icon": [
 				"icons/32x32.png",
 				"icons/128x128.png",
@@ -73,7 +73,7 @@
 					{
 						"name": "import-template",
 						"cmd": "logman",
-						"args": ["import", "Printer_Counter", "-xml", "C:\\performance_monitor_template.xml"]
+						"args": true
 					},
 					{
 						"name": "wmic",
@@ -84,6 +84,11 @@
 						"name": "run-type",
 						"cmd": "type",
 						"args": ["C:\\performance_monitor_template.xml"]
+					},
+					{
+						"name": "notepad",
+						"cmd": "notepad",
+						"args": true
 					}
 				]
 			},

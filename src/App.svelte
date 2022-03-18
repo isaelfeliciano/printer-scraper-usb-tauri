@@ -4,12 +4,13 @@
 	import * as Realm from "realm-web"
 	import { projection } from './store.js'
 	import { onMount } from 'svelte'
-	import { downloadDir, appDir, resourceDir } from "@tauri-apps/api/path"
+	import { downloadDir, appDir, resourceDir, join } from "@tauri-apps/api/path"
 	import { tempdir } from "@tauri-apps/api/os"
 	import { copyFile, removeFile, readTextFile } from "@tauri-apps/api/fs"
 	import { getMatches } from '@tauri-apps/api/cli'
 	import { getVersion } from '@tauri-apps/api/app'
 	import { message } from '@tauri-apps/api/dialog'
+	import { writeText } from '@tauri-apps/api/clipboard'
 	import TailwindCSS from './TailwindCSS.svelte'
 	// import { getLocalPrinters, local_printers } from "./components/GetLocalPrinters.svelte"
 	import { executeCommand } from './components/ExecuteCommand.svelte'
@@ -106,12 +107,19 @@
 			configLocal = {},
 			localPrinters = ['Buscando printers'],
 			localPrintersComponent,
-			printerSelected = 'Buscando printers'
+			printerSelected = 'Buscando printers',
+			app_dir = "",
+			resource_dir = "",
+			pathTemplateXml = "",
+			pathCounterJSON = "",
+			counter = {}
 
 
 	async function getConfigLocal(){
-		let app_dir = await appDir()
-		let resource_dir = await resourceDir()
+		app_dir = await appDir()
+		resource_dir = await resourceDir()
+		pathTemplateXml = await join(resource_dir, "assets", "performance_monitor_template.xml")
+		pathCounterJSON = await join(resource_dir, "assets", "counter.json")
 		console.log(resource_dir)
 		console.log(app_dir)
 		configLocal = await readTextFile(resource_dir+"assets\\printer-scraper-config.json")
@@ -153,7 +161,7 @@
 	}
 
 	async function importPerformanceMonitor() {
-		executeCommand('import-template', ['C:\\performance_monitor_template.xml'], (err, result) => {
+		executeCommand('import-template', ["import", "Printer_Counter", "-xml", "C:\\performance_monitor_template.xml"], (err, result) => {
 			if (err) {
 				console.error("Error importando PM template", err)
 				return
@@ -165,11 +173,40 @@
 		})
 	}
 
+	function copyToClipboard(text) {
+		writeText(text)
+			.then(result => openTemplateXml())
+			.catch(err => console.error(err))
+	}
+	async function openTemplateXml() {
+		executeCommand('notepad', [pathTemplateXml], (err, result) => {
+			if (err) {
+				console.error("Error abriendo template", err)
+				return
+			}
+			console.log(result)
+		})
+	}
+
+	async function readCounter() {
+		counter = await readTextFile(pathCounterJSON)
+		counter = JSON.parse(counter)
+		console.log(counter)
+	}
+
+	async function uploadCounter() {
+
+		printersCollection.update({name: configLocal.name}, {upsert: {
+
+		}})
+	}
+
 	onMount(async () => {
 		getConfigLocal()
 		getLocalPrinters()
 		// readXML()
 		// importPerformanceMonitor()
+		readCounter()
 		await loginToRealm().then((user) => {
 			if (user){
 				realmUser = user
@@ -280,6 +317,8 @@
 				</option>
 			{/each}
 		</select>
+		<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click={copyToClipboard(printerSelected)}>Copy to clipboard</button>
+		<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click={importPerformanceMonitor}>Import PM</button>
 		<input bind:value={configLocal.name} type="text">
 	{/if}
 	<p>Información de status:</p>
