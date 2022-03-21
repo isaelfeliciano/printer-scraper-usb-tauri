@@ -123,8 +123,12 @@
 		console.log(resource_dir)
 		console.log(app_dir)
 		configLocal = await readTextFile(resource_dir+"assets\\printer-scraper-config.json")
+		configLocal = await readTextFile(resource_dir+"assets\\printer-scraper-config.json")
+		counter = await readTextFile(pathCounterJSON)
 		configLocal = JSON.parse(configLocal)
+		counter = JSON.parse(counter)
 		console.log(configLocal.name)
+		console.log(counter)
 	}
 
 	async function createPerformanceMonitor() {
@@ -188,12 +192,6 @@
 		})
 	}
 
-	async function readCounter() {
-		counter = await readTextFile(pathCounterJSON)
-		counter = JSON.parse(counter)
-		console.log(counter)
-	}
-
 	async function uploadCounter() {
 
 		printersCollection.update({name: configLocal.name}, {upsert: {
@@ -206,7 +204,6 @@
 		getLocalPrinters()
 		// readXML()
 		// importPerformanceMonitor()
-		readCounter()
 		await loginToRealm().then((user) => {
 			if (user){
 				realmUser = user
