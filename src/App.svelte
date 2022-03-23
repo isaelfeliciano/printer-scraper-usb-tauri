@@ -112,7 +112,8 @@
 			resource_dir = "",
 			pathTemplateXml = "",
 			pathCounterJSON = "",
-			counter = {}
+			counter = {},
+			thisPrinterFromRemote = {}
 
 
 	async function getConfigLocal(){
@@ -193,23 +194,38 @@
 	}
 
 	async function uploadCounter() {
-
 		printersCollection.update({name: configLocal.name}, {upsert: {
 
 		}})
 	}
 
+	function getThisPrinterFromRemote() {
+		return new Promise(async (resolve, reject) => {
+			let { name, company } = configLocal
+			try {
+				thisPrinterFromRemote = await printersCollection.findOne({name, company})
+				console.log(thisPrinterFromRemote)
+				resolve("Informacion remota obtenida con exito")
+			} catch {
+				reject("Error obteniendo informacion remota")
+			}
+		})
+	}
+
 	onMount(async () => {
-		getConfigLocal()
-		getLocalPrinters()
+		// await getThisPrinterFromRemote()
 		// readXML()
 		// importPerformanceMonitor()
 		await loginToRealm().then((user) => {
 			if (user){
 				realmUser = user
 				initializeMongoCollections().then(() => {
+					getConfigLocal()
+					getLocalPrinters()
 					// startInterval()
 				})
+			} else {
+				console.log("Secion no iniciada en MongoDB")
 			}
 		})
 
