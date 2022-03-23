@@ -14,10 +14,15 @@
 			"description": "Printer Scraper API",
 			"args": [
 				{
-					"short": "p",
 					"name": "path",
+					"short": "p",
 					"takesValue": true,
 					"description": "Origin path"
+				},
+				{
+					"name": "upload",
+					"short": "u",
+					"description": "Upload info to DB"
 				}
 			]
 		},

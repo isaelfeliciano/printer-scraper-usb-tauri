@@ -232,6 +232,7 @@
 		getMatches()
 			.then(async (value) => {
 				let temp_dir = await tempdir()
+				console.log(value)
 				if (!value.args.path.value) return
 				const originPath = value.args.path.value
 				const extractToOrigin = new Command("extrac32.exe", ['/Y', `${temp_dir}scraper_update.cab`, '/L', originPath])
