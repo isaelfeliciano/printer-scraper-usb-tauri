@@ -6,7 +6,7 @@
 	import { onMount } from 'svelte'
 	import { downloadDir, appDir, resourceDir, join } from "@tauri-apps/api/path"
 	import { tempdir } from "@tauri-apps/api/os"
-	import { copyFile, removeFile, readTextFile } from "@tauri-apps/api/fs"
+	import { copyFile, removeFile, readTextFile, writeFile } from "@tauri-apps/api/fs"
 	import { getMatches } from '@tauri-apps/api/cli'
 	import { getVersion } from '@tauri-apps/api/app'
 	import { message } from '@tauri-apps/api/dialog'
@@ -233,8 +233,9 @@
 
 		getMatches()
 			.then(async (value) => {
+				console.log(value)
 				let temp_dir = await tempdir()
-				// if (value.args.upload.conccurrence >= 1) {
+				// if (value.args.upload.occurrences >= 1) {
 				if (true) {
 					// Connect Mongo
 					// Get remote info
@@ -253,11 +254,26 @@
 							console.log("Secion no iniciada en MongoDB")
 						}
 					})
-					await getThisPrinterFromRemote()
 					await getConfigLocal()
+					await getThisPrinterFromRemote()
 					let remoteCounter = (thisPrinterFromRemote != null) ? thisPrinterFromRemote.counter : 0 
-					if (counter.actual > remoteCounter || thisPrinterFromRemote === null) {
-						uploadCounter()
+					if (counter.actual > remoteCounter || thisPrinterFromRemote == null) {
+						try {
+							await uploadCounter()
+						} catch(err) {
+							console.error("Error subiendo counter")
+						}
+					} else if (counter.actual < remoteCounter) {
+						counter.actual = remoteCounter
+						counter.base = remoteCounter
+						try {
+							writeFile({
+								contents: JSON.stringify(counter),
+								path: pathCounterJSON
+							}) 
+						} catch(err) {
+								console.error("Error guardando counter JSON", err)
+						}
 					}
 				}
 				if (!value.args.path.value) return
