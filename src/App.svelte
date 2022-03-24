@@ -194,17 +194,31 @@
 	}
 
 	async function uploadCounter() {
-		printersCollection.update({name: configLocal.name}, {upsert: {
-
-		}})
+		console.log("uploadCounter")
+		let { name, company, type } = configLocal
+		// let { counter } = counter.actual
+		try {
+			await printersCollection.updateOne({name, company},
+			{
+				"$set": {
+					name,
+					company,
+					type,
+					counter: counter.actual
+				}
+			}, {"upsert": true})
+		} catch(err) {
+			console.log(err)
+		}
 	}
 
 	function getThisPrinterFromRemote() {
+		console.log("getThisPrinterFromRemote")
 		return new Promise(async (resolve, reject) => {
 			let { name, company } = configLocal
 			try {
 				thisPrinterFromRemote = await printersCollection.findOne({name, company})
-				console.log(thisPrinterFromRemote)
+				console.log("Remote printer", thisPrinterFromRemote)
 				resolve("Informacion remota obtenida con exito")
 			} catch {
 				reject("Error obteniendo informacion remota")
@@ -216,30 +230,42 @@
 		// await getThisPrinterFromRemote()
 		// readXML()
 		// importPerformanceMonitor()
-		await loginToRealm().then((user) => {
-			if (user){
-				realmUser = user
-				initializeMongoCollections().then(() => {
-					getConfigLocal()
-					getLocalPrinters()
-					// startInterval()
-				})
-			} else {
-				console.log("Secion no iniciada en MongoDB")
-			}
-		})
 
 		getMatches()
 			.then(async (value) => {
 				let temp_dir = await tempdir()
-				console.log(value)
+				// if (value.args.upload.conccurrence >= 1) {
+				if (true) {
+					// Connect Mongo
+					// Get remote info
+					// Get local info
+					// Compare both counter, if local is greater then remote update remote and viceversa
+					// Close
+					await loginToRealm().then((user) => {
+						if (user){
+							realmUser = user
+							initializeMongoCollections().then(() => {
+								getConfigLocal()
+								getLocalPrinters()
+								// startInterval()
+							})
+						} else {
+							console.log("Secion no iniciada en MongoDB")
+						}
+					})
+					await getThisPrinterFromRemote()
+					await getConfigLocal()
+					let remoteCounter = (thisPrinterFromRemote != null) ? thisPrinterFromRemote.counter : 0 
+					if (counter.actual > remoteCounter || thisPrinterFromRemote === null) {
+						uploadCounter()
+					}
+				}
 				if (!value.args.path.value) return
 				const originPath = value.args.path.value
 				const extractToOrigin = new Command("extrac32.exe", ['/Y', `${temp_dir}scraper_update.cab`, '/L', originPath])
 				extractToOrigin.execute()
 				extractToOrigin.on('close', data => {
 					setTimeout(() => {
-						console.log('testtt')
 						let origin_path = value.args.path.value
 						open(`${origin_path}Printer-Scraper.exe`)
 							.then(result => {
