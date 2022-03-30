@@ -368,7 +368,7 @@
 <div class="container p-2 h-screen">
 	{#if configLocal.first_time == true}
 		<div class="mb-4">
-			<label class="block text-gray-700 text-sm font-bold mb-1" for="printername">Nombre de printer</label>
+			<label class="block text-gray-700 text-sm font-bold mb-1" for="printername">Nombre del printer</label>
 			<select bind:value={printerSelected} id="printername" class="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none">
 				{#each localPrinters as printer}
 					<option value={printer}>
@@ -376,7 +376,7 @@
 					</option>
 				{/each}
 			</select>
-			<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex" on:click={copyToClipboard(printerSelected)}>
+			<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 shadow rounded inline-flex" on:click={copyToClipboard(printerSelected)}>
 				<svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M21 10v10a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1V10a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1zM6 14H5V5h9v1a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h2a1 1 0 0 0 0-2z"/></svg>
 				<span>+ </span>
 				<svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M2.402 9.493A3 3 0 0 1 5.36 6h9.945a3 3 0 0 1 2.959 2.507l1.721 10.329A1 1 0 0 1 19 20H6.694a3 3 0 0 1-2.959-2.507l-1.333-8zM5.36 8a1 1 0 0 0-.987 1.164l1.334 8a1 1 0 0 0 .986.836H17.82l-1.528-9.164A1 1 0 0 0 15.306 8H5.36z" /><path fill-rule="evenodd" clip-rule="evenodd" d="M17 9a1 1 0 0 1 1-1h3a1 1 0 0 1 .98 1.196l-2 10a1 1 0 0 1-1.96-.392L19.78 10H18a1 1 0 0 1-1-1zM2.01 6.753A3 3 0 0 1 5 4h6a3 3 0 0 1 3 3 1 1 0 1 1-2 0 1 1 0 0 0-1-1H5a1 1 0 0 0-.996.927.803.803 0 0 0 .01.072l.472 2.837a1 1 0 1 1-1.972.328L2.04 7.328a2.326 2.326 0 0 1-.03-.575z"/></svg>
