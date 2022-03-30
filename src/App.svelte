@@ -227,6 +227,22 @@
 		})
 	}
 
+	async function saveFriendlyName() {
+		try {
+			await writeFile({
+				contents: JSON.stringify(configLocal),
+				path: resource_dir+"assets\\printer-scraper-config.json"
+			})
+			log("Nuevo nombre guardado con exito")
+		} catch(err) {
+				console.error("Error guardando counter config local", err)
+		}
+	}
+
+	function log(text) {
+		logList = [...logList, text]
+	}
+
 	onMount(async () => {
 		// await getThisPrinterFromRemote()
 		// readXML()
@@ -386,10 +402,11 @@
 
 		<label class="block text-gray-700 text-sm font-bold mb-1" for="friendlyname">Nombre en base de datos</label>
 		<input bind:value={configLocal.name} type="text" class="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none" id="friendlyname">
+		<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click="{saveFriendlyName}">Guardar nombre</button>
 	{/if}
 	<p>Información de status:</p>
 	<p>{statusMessage}</p>
-	<div class="relative bg-white h-1/4 w-100 p-2 overflow-auto rounded-sm">
+	<div class="shadow-inner relative bg-white h-1/4 w-100 p-2 overflow-auto rounded-sm">
 		<ul class="list-none">
 			{#each logList as _log}
 			<li>[{getTimestamp()}] {_log}</li>
@@ -409,5 +426,14 @@
 	</footer>
 </div>
 <style>
-	
+	ul {
+	    -moz-transform: rotate(180deg);
+	    -webkit-transform: rotate(180deg);
+	    transform: rotate(180deg);
+	}
+	ul > li {
+	    -moz-transform: rotate(-180deg);
+	    -webkit-transform: rotate(-180deg);
+	    transform: rotate(-180deg);
+	}
 </style>
