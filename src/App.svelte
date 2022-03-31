@@ -11,6 +11,7 @@
 	import { getVersion } from '@tauri-apps/api/app'
 	import { message } from '@tauri-apps/api/dialog'
 	import { writeText } from '@tauri-apps/api/clipboard'
+	import { appWindow } from '@tauri-apps/api/window'
 	import TailwindCSS from './TailwindCSS.svelte'
 	// import { getLocalPrinters, local_printers } from "./components/GetLocalPrinters.svelte"
 	import { executeCommand } from './components/ExecuteCommand.svelte'
@@ -19,6 +20,11 @@
 	import { checkUpdate, installUpdate } from "@tauri-apps/api/updater"
 	import { relaunch, exit } from "@tauri-apps/api/process";
 	import { listen } from "@tauri-apps/api/event";
+
+	let selectedWindow = appWindow.label;
+	const windowMap = {
+		[selectedWindow]: appWindow
+	}
 
 	let statusMessage = '';
 	let version;
@@ -235,7 +241,21 @@
 			})
 			log("Nuevo nombre guardado con exito")
 		} catch(err) {
-				console.error("Error guardando counter config local", err)
+				console.error("Error guardando config local", err)
+				log(`Error guardando counter config local Error: ${err}`)
+		}
+	}
+
+	async function setCounter() {
+		try {
+			await writeFile({
+				contents: JSON.stringify(counter),
+				path: pathCounterJSON
+			})
+			log("Contador guardado con exito")
+		} catch(err) {
+				console.error("Error guardando counter", err)
+				log(`Error guardando counter Error: ${err}`)
 		}
 	}
 
@@ -247,6 +267,9 @@
 		// await getThisPrinterFromRemote()
 		// readXML()
 		// importPerformanceMonitor()
+		setTimeout(() => {
+			// windowMap[selectedWindow].hide()
+		}, 3000)
 
 		getMatches()
 			.then(async (value) => {
@@ -402,7 +425,12 @@
 
 		<label class="block text-gray-700 text-sm font-bold mb-1" for="friendlyname">Nombre en base de datos</label>
 		<input bind:value={configLocal.name} type="text" class="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none" id="friendlyname">
-		<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click="{saveFriendlyName}">Guardar nombre</button>
+		<button class="w-48 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click="{saveFriendlyName}">Guardar nombre</button>
+
+		<label class="block text-gray-700 text-sm font-bold mb-1" for="friendlyname">Contador</label>
+		<input bind:value={counter.actual} type="number" class="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none" id="friendlyname">
+		<button class="w-48 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click="{setCounter}">Establecer contador</button>
+
 	{/if}
 	<p>Información de status:</p>
 	<p>{statusMessage}</p>

@@ -1,6 +1,6 @@
 {
 	"package": {
-		"productName": "Printer-Scraper",
+		"productName": "Printer Scraper USB",
 		"version": "0.1.1"
 	},
 	"build": {
@@ -103,19 +103,26 @@
 			"protocol": {
 				"asset": true,
 				"assetScope": ["$RESOURCE/**", "$APP/**"]
+			},
+			"window": {
+				"hide": true
 			}
 		},
 		"windows": [
 			{
 				"title": "Printer Scraper by Roger",
 				"width": 720,
-				"height": 360,
+				"height": 450,
 				"resizable": false,
 				"fullscreen": false
 			}
 		],
 		"security": {
 			"csp": "default-src blob: data: filesystem: ws: http: https: 'unsafe-eval' 'unsafe-inline'"
-		}
+		},
+		"systemTray": {
+	      "iconPath": "icons/icon.png",
+	      "iconAsTemplate": true
+	    }
 	}
 }
