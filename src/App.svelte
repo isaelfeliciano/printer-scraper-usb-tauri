@@ -119,7 +119,8 @@
 			pathTemplateXml = "",
 			pathCounterJSON = "",
 			counter = {},
-			thisPrinterFromRemote = {}
+			thisPrinterFromRemote = {},
+			closeWhenFinish = false
 
 
 	async function getConfigLocal(){
@@ -179,7 +180,7 @@
 			}
 			console.log(result)
 			if (result === "The command completed successfully."){
-				console.log("Template importado con exito")
+				console.log("Template importado con éxito")
 			}
 		})
 	}
@@ -214,8 +215,10 @@
 					date_collected: new Date()
 				}
 			}, {"upsert": true})
+			log("Counter actualizado con éxito")
 		} catch(err) {
 			console.log(err)
+			log(`[ERROR]: Actualizando counter, ${err}`)
 		}
 	}
 
@@ -226,7 +229,7 @@
 			try {
 				thisPrinterFromRemote = await printersCollection.findOne({name, company})
 				console.log("Remote printer", thisPrinterFromRemote)
-				resolve("Informacion remota obtenida con exito")
+				resolve("Informacion remota obtenida con éxito")
 			} catch {
 				reject("Error obteniendo informacion remota")
 			}
@@ -239,7 +242,7 @@
 				contents: JSON.stringify(configLocal),
 				path: resource_dir+"assets\\printer-scraper-config.json"
 			})
-			log("Nuevo nombre guardado con exito")
+			log("Nuevo nombre guardado con éxito")
 		} catch(err) {
 				console.error("Error guardando config local", err)
 				log(`Error guardando counter config local Error: ${err}`)
@@ -247,16 +250,64 @@
 	}
 
 	async function setCounter() {
+		counter.base = counter.actual
+		counter.old = counter.new = 0
 		try {
 			await writeFile({
 				contents: JSON.stringify(counter),
 				path: pathCounterJSON
 			})
-			log("Contador guardado con exito")
+			log("Contador guardado con éxito")
 		} catch(err) {
 				console.error("Error guardando counter", err)
 				log(`Error guardando counter Error: ${err}`)
 		}
+	}
+	async function saveConfiguration() {
+		if (counter.actual > thisPrinterFromRemote.counter) {
+			await uploadCounter()
+			windowMap[selectedWindow].close()
+		} else {
+			log("Contador no actualizado")
+		}
+	}
+
+	async function start() {
+		await loginToRealm().then((user) => {
+			if (user){
+				realmUser = user
+				initializeMongoCollections().then(() => {
+					getConfigLocal()
+					// startInterval()
+				})
+			} else {
+				console.log("Secion no iniciada en MongoDB")
+			}
+		})
+		await getConfigLocal()
+		await getThisPrinterFromRemote()
+		let remoteCounter = (thisPrinterFromRemote != null) ? thisPrinterFromRemote.counter : 0 
+		if (counter.actual > remoteCounter || thisPrinterFromRemote == null) {
+			try {
+				await uploadCounter()
+				if (closeWhenFinish) windowMap[selectedWindow].close()
+			} catch(err) {
+				console.error("Error subiendo counter")
+			}
+		} else if (counter.actual < remoteCounter) {
+			counter.actual = remoteCounter
+			counter.base = remoteCounter
+			try {
+				writeFile({
+					contents: JSON.stringify(counter),
+					path: pathCounterJSON
+				}) 
+			} catch(err) {
+					console.error("Error guardando counter JSON", err)
+					if (closeWhenFinish) windowMap[selectedWindow].close()
+			}
+		}
+		exit()
 	}
 
 	function log(text) {
@@ -271,50 +322,25 @@
 			// windowMap[selectedWindow].hide()
 		}, 3000)
 
+		start()
 		getMatches()
 			.then(async (value) => {
 				console.log(value)
 				let temp_dir = await tempdir()
-				// if (value.args.upload.occurrences >= 1) {
-				if (true) {
+				if (!value.args.upload.occurrences >= 1) {
+				// if (true) {
+					windowMap[selectedWindow].show()
+					// start()
+					getLocalPrinters()
 					// Connect Mongo
 					// Get remote info
 					// Get local info
 					// Compare both counter, if local is greater then remote update remote and viceversa
 					// Close
-					await loginToRealm().then((user) => {
-						if (user){
-							realmUser = user
-							initializeMongoCollections().then(() => {
-								getConfigLocal()
-								getLocalPrinters()
-								// startInterval()
-							})
-						} else {
-							console.log("Secion no iniciada en MongoDB")
-						}
-					})
-					await getConfigLocal()
-					await getThisPrinterFromRemote()
-					let remoteCounter = (thisPrinterFromRemote != null) ? thisPrinterFromRemote.counter : 0 
-					if (counter.actual > remoteCounter || thisPrinterFromRemote == null) {
-						try {
-							await uploadCounter()
-						} catch(err) {
-							console.error("Error subiendo counter")
-						}
-					} else if (counter.actual < remoteCounter) {
-						counter.actual = remoteCounter
-						counter.base = remoteCounter
-						try {
-							writeFile({
-								contents: JSON.stringify(counter),
-								path: pathCounterJSON
-							}) 
-						} catch(err) {
-								console.error("Error guardando counter JSON", err)
-						}
-					}
+				}
+				if (value.args.upload.occurrences >= 1) {
+					closeWhenFinish = true
+					setTimeout(() => { exit() }, 20000)
 				}
 				if (!value.args.path.value) return
 				const originPath = value.args.path.value
@@ -430,6 +456,7 @@
 		<label class="block text-gray-700 text-sm font-bold mb-1" for="friendlyname">Contador</label>
 		<input bind:value={counter.actual} type="number" class="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none" id="friendlyname">
 		<button class="w-48 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click="{setCounter}">Establecer contador</button>
+		<button class="mt-4 block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click={saveConfiguration}>Completar configuración</button>
 
 	{/if}
 	<p>Información de status:</p>

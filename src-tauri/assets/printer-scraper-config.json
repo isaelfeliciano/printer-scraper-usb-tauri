@@ -4,5 +4,6 @@
 	"brand": "EPSON",
 	"model": "L380",
 	"type": "printer",
+	"usb": true,
 	"first_time": true
 }

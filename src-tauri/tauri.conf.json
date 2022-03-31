@@ -105,16 +105,18 @@
 				"assetScope": ["$RESOURCE/**", "$APP/**"]
 			},
 			"window": {
-				"hide": true
+				"hide": true,
+				"show": true
 			}
 		},
 		"windows": [
 			{
 				"title": "Printer Scraper by Roger",
 				"width": 720,
-				"height": 450,
+				"height": 520,
 				"resizable": false,
-				"fullscreen": false
+				"fullscreen": false,
+				"visible": false
 			}
 		],
 		"security": {
