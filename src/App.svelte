@@ -290,9 +290,10 @@
 		if (counter.actual > remoteCounter || thisPrinterFromRemote == null) {
 			try {
 				await uploadCounter()
-				if (closeWhenFinish) windowMap[selectedWindow].close()
+				log("Counter subido")
 			} catch(err) {
 				console.error("Error subiendo counter")
+				log("[ERROR]: Error subiendo counter")
 			}
 		} else if (counter.actual < remoteCounter) {
 			counter.actual = remoteCounter
@@ -301,13 +302,15 @@
 				writeFile({
 					contents: JSON.stringify(counter),
 					path: pathCounterJSON
-				}) 
+				})
+				log("Json guardado") 
 			} catch(err) {
 					console.error("Error guardando counter JSON", err)
-					if (closeWhenFinish) windowMap[selectedWindow].close()
+					log(`[ERROR] guardando counter JSON: ${err}`)
 			}
 		}
-		exit()
+		if (closeWhenFinish)
+			exit()
 	}
 
 	function log(text) {
@@ -322,41 +325,45 @@
 			// windowMap[selectedWindow].hide()
 		}, 3000)
 
-		start()
+		// start()
 		getMatches()
 			.then(async (value) => {
 				console.log(value)
 				let temp_dir = await tempdir()
+				// UPDATER
+				if (value.args.path.occurrences >= 1) {
+					const originPath = value.args.path.value
+					const extractToOrigin = new Command("extrac32.exe", ['/Y', `${temp_dir}scraper_update.cab`, '/L', originPath])
+					extractToOrigin.execute()
+					extractToOrigin.on('close', data => {
+						setTimeout(() => {
+							let origin_path = value.args.path.value
+							open(`${origin_path}Printer-Scraper.exe`)
+								.then(result => {
+									console.log("Origin app opened")
+									exit()
+								})
+								.catch(error => console.error("Opening origin app", error))
+						}, 60000)
+					})
+				}
+				// UPDATER
+
 				if (!value.args.upload.occurrences >= 1) {
 				// if (true) {
 					windowMap[selectedWindow].show()
-					// start()
+					start()
 					getLocalPrinters()
 					// Connect Mongo
 					// Get remote info
 					// Get local info
 					// Compare both counter, if local is greater then remote update remote and viceversa
 					// Close
+					return
 				}
-				if (value.args.upload.occurrences >= 1) {
-					closeWhenFinish = true
-					setTimeout(() => { exit() }, 20000)
-				}
-				if (!value.args.path.value) return
-				const originPath = value.args.path.value
-				const extractToOrigin = new Command("extrac32.exe", ['/Y', `${temp_dir}scraper_update.cab`, '/L', originPath])
-				extractToOrigin.execute()
-				extractToOrigin.on('close', data => {
-					setTimeout(() => {
-						let origin_path = value.args.path.value
-						open(`${origin_path}Printer-Scraper.exe`)
-							.then(result => {
-								console.log("Origin app opened")
-								exit()
-							})
-							.catch(error => console.error("Opening origin app", error))
-					}, 60000)
-				})
+				closeWhenFinish = true
+				start()
+				log("Start")
 			})
 			.catch((error) => {
 				statusMessage = error
