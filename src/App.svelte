@@ -114,7 +114,7 @@
 			localPrinters = ['Buscando printers'],
 			localPrintersComponent,
 			printerSelected = 'Buscando printers',
-			app_dir = "",
+			// app_dir = "",
 			resource_dir = "",
 			pathTemplateXml = "",
 			pathCounterJSON = "",
@@ -124,12 +124,12 @@
 
 
 	async function getConfigLocal(){
-		app_dir = await appDir()
+		// app_dir = await appDir()
 		resource_dir = await resourceDir()
 		pathTemplateXml = await join(resource_dir, "assets", "performance_monitor_template.xml")
 		pathCounterJSON = await join(resource_dir, "assets", "counter.json")
 		console.log(resource_dir)
-		console.log(app_dir)
+		// console.log(app_dir)
 		configLocal = await readTextFile(resource_dir+"assets\\printer-scraper-config.json")
 		configLocal = await readTextFile(resource_dir+"assets\\printer-scraper-config.json")
 		counter = await readTextFile(pathCounterJSON)
