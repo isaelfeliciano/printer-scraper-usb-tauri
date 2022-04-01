@@ -202,7 +202,7 @@
 
 	async function uploadCounter() {
 		console.log("uploadCounter")
-		let { name, company, type } = configLocal
+		let { name, company, type, usb } = configLocal
 		// let { counter } = counter.actual
 		try {
 			await printersCollection.updateOne({name, company},
@@ -211,6 +211,7 @@
 					name,
 					company,
 					type,
+					usb,
 					counter: counter.actual,
 					date_collected: new Date()
 				}
@@ -285,6 +286,7 @@
 			}
 		})
 		await getConfigLocal()
+		if (configLocal.name === "N/A") return // Printer not set yet nor in DB
 		await getThisPrinterFromRemote()
 		let remoteCounter = (thisPrinterFromRemote != null) ? thisPrinterFromRemote.counter : 0 
 		if (counter.actual > remoteCounter || thisPrinterFromRemote == null) {
