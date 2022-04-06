@@ -6,7 +6,7 @@
 	import { onMount } from 'svelte'
 	import { downloadDir, appDir, resourceDir, join } from "@tauri-apps/api/path"
 	import { tempdir } from "@tauri-apps/api/os"
-	import { copyFile, removeFile, readTextFile, writeFile } from "@tauri-apps/api/fs"
+	import { copyFile, removeFile, readTextFile, writeFile, createDir } from "@tauri-apps/api/fs"
 	import { getMatches } from '@tauri-apps/api/cli'
 	import { getVersion } from '@tauri-apps/api/app'
 	import { message } from '@tauri-apps/api/dialog'
@@ -258,7 +258,7 @@
 				contents: JSON.stringify(counter),
 				path: pathCounterJSON
 			})
-			log("Contador guardado con éxito")
+			log("Contador guardado con éxito", true)
 		} catch(err) {
 				console.error("Error guardando counter", err)
 				log(`Error guardando counter Error: ${err}`)
@@ -315,8 +315,47 @@
 			exit()
 	}
 
-	function log(text) {
+	async function log(text, writeLogToText) {
 		logList = [...logList, text]
+		if (writeLogToText) {
+			let _appDir = await appDir()
+			let pathLog = await join(resource_dir, 'log.txt')
+			try {
+				// File exist
+				let logFile = await readTextFile(pathLog)
+				let logFileSplit = logFile.split('\n')
+				if (logFileSplit.length >= 500) { // File reach the lines limit
+					try {
+						writeFile({
+							contents: `[${getTimestamp()}] ${text}\n`,
+							path: pathLog
+						})
+					} catch (err) {
+						console.log(`Error escribiendo log.txt : ${err}`)
+					}
+				} else {
+					try {
+						writeFile({
+							contents: `${logFile}[${getTimestamp()}] ${text}\n`,
+							path: pathLog
+						})
+					} catch (err) {
+						console.log(`Error añadiendo log.txt : ${err}`)
+					}
+				}
+			} catch(err) {
+				// File does not exist
+				try {
+					writeFile({
+						contents: `[${getTimestamp()}] ${text}\n`,
+						path: pathLog
+					})
+				} catch (err) {
+					console.log(`Error creando log.txt : ${err}`)
+				}
+				console.log("Error: ", err)
+			}
+		}
 	}
 
 	onMount(async () => {
