@@ -216,10 +216,10 @@
 					date_collected: new Date()
 				}
 			}, {"upsert": true})
-			log("Counter actualizado con éxito")
+			log("Counter actualizado con éxito", true)
 		} catch(err) {
 			console.log(err)
-			log(`[ERROR]: Actualizando counter, ${err}`)
+			log(`[ERROR]: Actualizando counter, ${err}`, true)
 		}
 	}
 
@@ -243,7 +243,7 @@
 				contents: JSON.stringify(configLocal),
 				path: resource_dir+"assets\\printer-scraper-config.json"
 			})
-			log("Nuevo nombre guardado con éxito")
+			log("Nuevo nombre guardado con éxito", true)
 		} catch(err) {
 				console.error("Error guardando config local", err)
 				log(`Error guardando counter config local Error: ${err}`)
@@ -269,7 +269,7 @@
 			await uploadCounter()
 			windowMap[selectedWindow].close()
 		} else {
-			log("Contador no actualizado")
+			log("Contador no actualizado", true)
 		}
 	}
 
@@ -277,13 +277,23 @@
 		await loginToRealm().then((user) => {
 			if (user){
 				realmUser = user
+				log("Sesión iniciada en DB", true)
 				initializeMongoCollections().then(() => {
 					getConfigLocal()
 					// startInterval()
 				})
 			} else {
-				console.log("Secion no iniciada en MongoDB")
+				console.log("Sesión no iniciada en MongoDB")
+				log("Sesión no iniciada en DB", true)
+				if (closeWhenFinish)
+					exit()
 			}
+		})
+		.catch(err => {
+			console.log("Sesión no iniciada en MongoDB")
+			log("Sesión no iniciada en DB", true)
+			if (closeWhenFinish)
+				exit()
 		})
 		await getConfigLocal()
 		if (configLocal.name === "N/A") return // Printer not set yet nor in DB
@@ -292,10 +302,10 @@
 		if (counter.actual > remoteCounter || thisPrinterFromRemote == null) {
 			try {
 				await uploadCounter()
-				log("Counter subido")
+				log("Counter subido", true)
 			} catch(err) {
 				console.error("Error subiendo counter")
-				log("[ERROR]: Error subiendo counter")
+				log("[ERROR]: Error subiendo counter", true)
 			}
 		} else if (counter.actual < remoteCounter) {
 			counter.actual = remoteCounter
@@ -305,7 +315,7 @@
 					contents: JSON.stringify(counter),
 					path: pathCounterJSON
 				})
-				log("Json guardado") 
+				log("Json guardado", true) 
 			} catch(err) {
 					console.error("Error guardando counter JSON", err)
 					log(`[ERROR] guardando counter JSON: ${err}`)
@@ -404,7 +414,7 @@
 				}
 				closeWhenFinish = true
 				start()
-				log("Start")
+				log("Start", true)
 			})
 			.catch((error) => {
 				statusMessage = error
