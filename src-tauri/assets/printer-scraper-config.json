@@ -5,5 +5,6 @@
 	"model": "L380",
 	"type": "printer",
 	"usb": true,
-	"first_time": true
+	"first_time": true,
+	"last_time_upload": "0-0-0"
 }

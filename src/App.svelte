@@ -217,6 +217,17 @@
 				}
 			}, {"upsert": true})
 			log("Counter actualizado con éxito", true)
+			configLocal.last_time_upload = (new Date()).toJSON().slice(0, 10)
+			try {
+				await writeFile({
+					contents: JSON.stringify(configLocal),
+					path: resource_dir+"assets\\printer-scraper-config.json"
+				})
+				log("Fecha ultimo upload actualizado", true)
+			} catch(err) {
+					console.error("Error actualizando fecha ultimo upload", err)
+					log(`Error actualizando fecha ultimo upload: ${err}`)
+			}
 		} catch(err) {
 			console.log(err)
 			log(`[ERROR]: Actualizando counter, ${err}`, true)
