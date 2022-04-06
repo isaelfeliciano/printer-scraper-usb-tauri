@@ -274,11 +274,29 @@
 				console.error("Error guardando counter", err)
 				log(`Error guardando counter Error: ${err}`)
 		}
+
+		if (!configLocal.first_time && counter.actual > thisPrinterFromRemote.counter) {
+			await uploadCounter()
+		} else {
+			log("Contador no actualizado", true)
+		}
 	}
 	async function saveConfiguration() {
+		try {
+			configLocal.first_time = false
+			await writeFile({
+				contents: JSON.stringify(configLocal),
+				path: resource_dir+"assets\\printer-scraper-config.json"
+			})
+			log("Configuracion guardada con éxito")
+		} catch(err) {
+				console.error("Error guardando config local", err)
+				log(`Error guardando config local Error: ${err}`)
+		}
+
 		if (counter.actual > thisPrinterFromRemote.counter) {
 			await uploadCounter()
-			windowMap[selectedWindow].close()
+			exit()
 		} else {
 			log("Contador no actualizado", true)
 		}
@@ -500,7 +518,15 @@
 
 
 <div class="container p-2 h-screen">
+	<label class="block text-gray-700 text-sm font-bold mb-1" for="friendlyname">Contador</label>
+	<input bind:value={counter.actual} type="number" class="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none" id="friendlyname">
+	<button class="w-48 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click="{setCounter}">Establecer contador</button>
+
 	{#if configLocal.first_time == true}
+		<label class="block text-gray-700 text-sm font-bold mb-1" for="friendlyname">Nombre en base de datos</label>
+		<input bind:value={configLocal.name} type="text" class="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none" id="friendlyname">
+		<button class="w-48 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click="{saveFriendlyName}">Guardar nombre</button>
+
 		<div class="mb-4">
 			<label class="block text-gray-700 text-sm font-bold mb-1" for="printername">Nombre del printer</label>
 			<select bind:value={printerSelected} id="printername" class="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none">
@@ -518,15 +544,24 @@
 		</div>
 		<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded hidden" on:click={importPerformanceMonitor}>Import PM</button>
 
-		<label class="block text-gray-700 text-sm font-bold mb-1" for="friendlyname">Nombre en base de datos</label>
-		<input bind:value={configLocal.name} type="text" class="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none" id="friendlyname">
-		<button class="w-48 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click="{saveFriendlyName}">Guardar nombre</button>
+		<div class="flex">
+			<div class="mr-1">
+				<label class="block text-gray-700 text-sm font-bold mb-1" for="company">Compañía</label>
+				<input bind:value={configLocal.company} type="text" class="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none" id="company">
+			</div>
+				
+			<div class="mr-1">
+				<label class="block text-gray-700 text-sm font-bold mb-1" for="brand">Marca</label>
+				<input bind:value={configLocal.brand} type="text" class="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none" id="brand">
+			</div>
 
-		<label class="block text-gray-700 text-sm font-bold mb-1" for="friendlyname">Contador</label>
-		<input bind:value={counter.actual} type="number" class="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none" id="friendlyname">
-		<button class="w-48 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click="{setCounter}">Establecer contador</button>
-		<button class="mt-4 block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click={saveConfiguration}>Completar configuración</button>
+			<div class="">
+				<label class="block text-gray-700 text-sm font-bold mb-1" for="model">Modelo</label>
+				<input bind:value={configLocal.model} type="text" class="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none" id="model">
+			</div>
+		</div>
 
+		<button class="mx-auto w-full mt-4 block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click={saveConfiguration}>Completar configuración</button>
 	{/if}
 	<p>Información de status:</p>
 	<p>{statusMessage}</p>
