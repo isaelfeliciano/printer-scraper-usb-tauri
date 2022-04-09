@@ -61,11 +61,12 @@
 			}
 		},
 		"updater": {
-			"active": false,
+			"active": true,
 			"endpoints": [
-				"https://firebasestorage.googleapis.com/v0/b/printer-scraper.appspot.com/o/printer-scraper-update-manifest.json?alt=media"
+				"https://firebasestorage.googleapis.com/v0/b/tauri-updater.appspot.com/o/printer-scraper-usb-update-manifest.json?alt=media"
 			],
-			"dialog": false
+			"dialog": true,
+			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IENDOTRGOTlBNjhFMzY2ODgKUldTSVp1Tm9tdm1VekJmbnZrSk9CcytzYW5GUXhON1FwWWpRMlV1R2NUZWt5U1NGaFJMYkNEbW0K"
 		},
 		"allowlist": {
 			"all": true,

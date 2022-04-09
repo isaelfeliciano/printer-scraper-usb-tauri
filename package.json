@@ -7,7 +7,9 @@
 		"build": "rollup -c",
 		"dev": "rollup -c -w",
 		"start": "sirv public --no-clear -p 5050",
-		"validate": "svelte-check"
+		"validate": "svelte-check",
+		"makecab": "makecab /d CabinetNameTemplate=scraper_usb_update.cab /d CabinetFileCountThreshold=0 /d FolderFileCountThreshold=0 /d FolderSizeThreshold=0 /d MaxCabinetSize=0 /d MaxDiskFileCount=0 /d MaxDiskSize=0 /D DiskDirectoryTeemplate=src-tauri/target/release /f cab_files_list.txt /d DiskDirectoryTemplate=update_cab",
+		"makecab_": "makecab /f cab_files_list.txt src-tauri/target/release/scraper_usb_update.cab"
 	},
 	"devDependencies": {
 		"@fullhuman/postcss-purgecss": "^4.0.3",

@@ -1,0 +1,9 @@
+"C:\Users\isael\webdev\printer-scraper-usb-tauri\src-tauri\target\release\Printer Scraper USB.exe"
+C:\Users\isael\webdev\printer-scraper-usb-tauri\src-tauri\target\release\assets\counter.json
+C:\Users\isael\webdev\printer-scraper-usb-tauri\src-tauri\target\release\assets\performance_monitor_template.xml
+C:\Users\isael\webdev\printer-scraper-usb-tauri\src-tauri\target\release\assets\printer-scraper-config.json
+C:\Users\isael\webdev\printer-scraper-usb-tauri\src-tauri\target\release\assets\printer-scraper-usb.exe
+C:\Users\isael\webdev\printer-scraper-usb-tauri\src-tauri\target\release\assets\printer_scraper_task.xml
+C:\Users\isael\webdev\printer-scraper-usb-tauri\src-tauri\target\release\assets\printer_scraper_upload.xml
+C:\Users\isael\webdev\printer-scraper-usb-tauri\src-tauri\target\release\binaries\start_second_instance.cmd
+

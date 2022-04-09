@@ -29,73 +29,6 @@
 	let statusMessage = '';
 	let version;
 	let logList = [];
-	(async () => {
-		version = await getVersion()
-		try {
-			let {shouldUpdate, manifest} =  await checkUpdate()
-			if (shouldUpdate) {
-				// display dialog
-				// await installUpdate()
-
-				// download file
-				manifest = manifest.body.replace(/'/ig, `"`)
-				manifest = JSON.parse(manifest)
-				fetch(manifest[1])
-				.then((transfer) => {
-					return transfer.blob()
-				}).then(async (bytes) => {
-					let elm = document.createElement('a')
-					elm.href = URL.createObjectURL(bytes)
-					elm.setAttribute('download', 'scraper_update.cab')
-					elm.click()
-					setTimeout(async () => {
-						let download_dir = await downloadDir()
-						let current_dir = await currentDir()
-						let temp_dir = await tempdir()
-						copyFile(`${download_dir}scraper_update.cab`, `${temp_dir}scraper_update.cab`)
-							.then((result) => {
-								removeFile(`${download_dir}scraper_update.cab`)
-								.then(result => console.log("File deleted", result))
-								.catch(error => console.error("Error deleting file", error))
-
-								const extract = new Command("extrac32.exe", ['/Y', `${temp_dir}scraper_update.cab`, '/L', temp_dir, /* only extract app file */"Printer-Scraper.exe"])
-								extract.execute()
-								extract.on('close', data => {
-									console.log('Extract finished', temp_dir)
-									const secondInstance = new Command('binaries\\start_second_instance.cmd', [`${temp_dir}Printer-Scraper.exe`, '-p', current_dir])
-									secondInstance.execute()
-									secondInstance.stdout.on('data', data => {
-										exit()
-									})
-								})
-							})
-							.catch((error) => {
-								console.error("copyFile", error)
-							})
-					}, 2000)
-
-				}).catch((error) => {
-					console.error(error)
-				})
-
-				// install complete, restart app
-				// await relaunch()
-			}
-		} catch(error) {
-			console.error("Updater error:", error)
-		}
-	})()
-
-
-	listen("tauri://update-available", function (res) {
-	  console.log("New version available: ", res);
-
-	  listen("tauri://update-status", function (res) {
-		  console.log("New status: ", res);
-		});
-	});
-
-	// UPDATER
 
 	const REALM_APP_ID = "printer_scraper-drfeu"
 	const realmApp = new Realm.App({id: REALM_APP_ID})
@@ -410,25 +343,6 @@
 			.then(async (value) => {
 				console.log(value)
 				let temp_dir = await tempdir()
-				// UPDATER
-				if (value.args.path.occurrences >= 1) {
-					const originPath = value.args.path.value
-					const extractToOrigin = new Command("extrac32.exe", ['/Y', `${temp_dir}scraper_update.cab`, '/L', originPath])
-					extractToOrigin.execute()
-					extractToOrigin.on('close', data => {
-						setTimeout(() => {
-							let origin_path = value.args.path.value
-							open(`${origin_path}Printer-Scraper.exe`)
-								.then(result => {
-									console.log("Origin app opened")
-									exit()
-								})
-								.catch(error => console.error("Opening origin app", error))
-						}, 60000)
-					})
-				}
-				// UPDATER
-
 				if (!value.args.upload.occurrences >= 1) {
 				// if (true) {
 					windowMap[selectedWindow].show()
