@@ -160,10 +160,14 @@
 			} catch(err) {
 					console.error("Error actualizando fecha ultimo upload", err)
 					log(`Error actualizando fecha ultimo upload: ${err}`)
+					if(closeWhenFinish)
+						exit()
 			}
 		} catch(err) {
 			console.log(err)
 			log(`[ERROR]: Actualizando counter, ${err}`, true)
+			if(closeWhenFinish)
+				exit()
 		}
 	}
 
